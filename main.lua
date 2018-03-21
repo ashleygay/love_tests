@@ -18,16 +18,8 @@ actions = {}
 -- LOVE callbacks --
 --------------------
 
-function love.draw()
-	love.graphics.setColor(255, 255, 255)
-	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height)
-	love.graphics.draw(player.img, player.x, player.y, 0, 1, 1, 0, 32)
-
-	--local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
-	--love.graphics.draw(animation.spriteSheet, animation.quads[spriteNum], 0, 0, 0, 4)
-end
-
 function love.load()
+	animation = newAnimation(love.graphics.newImage("hero.png"), 16, 18, 1)
 	-- Platform setup
 	platform.width = love.graphics.getWidth()
 	platform.height = love.graphics.getHeight()
@@ -46,10 +38,6 @@ function love.load()
 	player.accel = 300
 	player.deccel = 100
 	player.max_abs_speed = 600
-
-	-- Animation setup
-	animation = newAnimation(love.graphics.newImage("hero.png"), 16, 18, 1)
-	entities["player"] = player
 end
 
 function love.update(dt)
@@ -89,6 +77,7 @@ function love.update(dt)
 		player.y = player.ground
 	end
 
+	-- update animation
 	animation.currentTime = animation.currentTime + dt
 	if animation.currentTime >= animation.duration then
 		animation.currentTime = animation.currentTime - animation.duration
@@ -101,7 +90,16 @@ function love.update(dt)
 	end
 end
 
-function updateMovement(entityIndex)
+function love.draw()
+	local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
+	print("spriteNum", spriteNum)
+	print("Spritesheet", animation.spritesheet)
+	print("quad[spriteNum]", animation.quads[spriteNum])
+	love.graphics.draw(animation.spritesheet, animation.quads[spriteNum], 0, 0, 0, 4)
+
+	love.graphics.setColor(255, 255, 255)
+	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height)
+	love.graphics.draw(player.img, player.x, player.y, 0, 1, 1, 0, 32)
 end
 
 -----------------------------------
@@ -122,20 +120,26 @@ end
 -- Generate an animation table ready for use
 -- Each frame have the same width, height and duration
 function newAnimation(image, width, height, duration)
-	local animation = {}
-	animation.spritesheet = image;
-	animation.quads = {};
+	local _animation = {}
+	_animation.spritesheet = image;
+	_animation.quads = {};
+
+	print("Image", image)
+	print("Creating spritesheet", _animation.spritesheet)
+
 	for y = 0, image:getHeight() - height, height do
 		for x = 0, image:getWidth() - width, width do
-			table.insert(animation.quads, love.graphics.newQuad(x, y,
+			print("Test", x, y, width, height)
+			table.insert(_animation.quads, love.graphics.newQuad(x, y,
 				width, height, image:getDimensions()))
         end
     end
 
-	animation.duration = duration
-	animation.currentTime = 0
+	_animation.duration = duration or 1
+	_animation.currentTime = 0
 
-	return animation
+	print("Returning spritesheet", _animation.spritesheet)
+	return _animation
 end
 
 function isDown(str)
