@@ -19,7 +19,7 @@ actions = {}
 --------------------
 
 function love.load()
-	animation = newAnimation(love.graphics.newImage("hero.png"), 16, 18, 1)
+	animation = newAnimation(love.graphics.newImage("more_robots.png"), 64, 64, 1/4)
 	-- Platform setup
 	platform.width = love.graphics.getWidth()
 	platform.height = love.graphics.getHeight()
@@ -91,11 +91,12 @@ function love.update(dt)
 end
 
 function love.draw()
-	local spriteNum = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
-	print("spriteNum", spriteNum)
+	local index = 4;
+	local frameIndex = math.floor(animation.currentTime / animation.duration * #animation.quads[index]) + 1
+	print("frameIndex", frameIndex)
 	print("Spritesheet", animation.spritesheet)
-	print("quad[spriteNum]", animation.quads[spriteNum])
-	love.graphics.draw(animation.spritesheet, animation.quads[spriteNum], 0, 0, 0, 4)
+	print("quad[frameIndex]", animation.quads[frameIndex])
+	love.graphics.draw(animation.spritesheet, animation.quads[index][frameIndex], 0, 0, 0, 2)
 
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height)
@@ -105,7 +106,6 @@ end
 -----------------------------------
 -- No callbacks below this point --
 -----------------------------------
-
 -- A given animation is for a given action (walking left. falling, etc...)
 -- Each action is bound to condition and a callback function
 -- The condition can be a keybind press or another condition (ex: falling)
@@ -117,22 +117,36 @@ end
 -- 	-> The idle animation can differ based on the previous animation.
 
 
+-- ANIMATIONS --
+-- Terminology:
+--	frame_index ->  in the table of the animation for the current frame
+--	animation_index -> index to get the table of frames for the current state
+--		IE: falling, jumping, going left,...
+--
+--	In C, we would compute the frame like this:
+--		struct frame;
+--		frame ** ptr = animation_table
+--		frame f = ptr[animation_index][frame_index]
+--
+
 -- Generate an animation table ready for use
 -- Each frame have the same width, height and duration
 function newAnimation(image, width, height, duration)
 	local _animation = {}
 	_animation.spritesheet = image;
-	_animation.quads = {};
+	_animation.quads = {{},{},{},{}}; --TODO: fix that shit
 
 	print("Image", image)
 	print("Creating spritesheet", _animation.spritesheet)
 
+	local index = 1;
 	for y = 0, image:getHeight() - height, height do
 		for x = 0, image:getWidth() - width, width do
-			print("Test", x, y, width, height)
-			table.insert(_animation.quads, love.graphics.newQuad(x, y,
+			print("Test", x, y, width, height, "Index:", index)
+			table.insert(_animation.quads[index], love.graphics.newQuad(x, y,
 				width, height, image:getDimensions()))
         end
+		index = index + 1;
     end
 
 	_animation.duration = duration or 1
