@@ -40,6 +40,45 @@ function love.load()
 	player.max_abs_speed = 600
 end
 
+
+-- Animation
+-- actual index into the animation table
+-- ending_animation;
+-- required condition: all must be met to go into it
+-- accepting condition: only one can be met
+
+-- In order to go into the animation, the player must satisfy all
+-- required conditions and at least one accepting condition
+
+-- State:
+--	int animation_index; -> index into the animation table
+--	bool can_move;
+--	bool contacless; -> invincibility frames
+--	State getNextAnimationState(); -> returns the next state for the playendeir
+
+Animation =
+{
+	ending_animation = 1;
+	animation_index = 1; -- index into the spritesheet
+	required_conditions = {};
+	accepting_conditions = {};
+}
+
+PlayerState = {
+	animation = Animation;
+	animations  = {[1] = animation};
+	can_move = true;
+	-- all for now
+}
+
+function PlayerState.test(self)
+	return self.animation_index;
+end
+
+function PlayerState.updateAnimation(self)
+	animation = self.animations[current_animation]
+end
+
 function love.update(dt)
 	-- We update only one entity for one `love.update` call,
 	-- we increase the wrap-around index into the tables of entities to update.
@@ -115,8 +154,6 @@ end
 -- animation.
 -- We have a last index for the selected idle animation.
 -- 	-> The idle animation can differ based on the previous animation.
-
-
 -- ANIMATIONS --
 -- Terminology:
 --	frame_index ->  in the table of the animation for the current frame
