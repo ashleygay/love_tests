@@ -40,45 +40,6 @@ function love.load()
 	player.max_abs_speed = 600
 end
 
-
--- Animation
--- actual index into the animation table
--- ending_animation;
--- required condition: all must be met to go into it
--- accepting condition: only one can be met
-
--- In order to go into the animation, the player must satisfy all
--- required conditions and at least one accepting condition
-
--- State:
---	int animation_index; -> index into the animation table
---	bool can_move;
---	bool contacless; -> invincibility frames
---	State getNextAnimationState(); -> returns the next state for the playendeir
-
-Animation =
-{
-	ending_animation = 1;
-	animation_index = 1; -- index into the spritesheet
-	required_conditions = {};
-	accepting_conditions = {};
-}
-
-PlayerState = {
-	animation = Animation;
-	animations  = {[1] = animation};
-	can_move = true;
-	-- all for now
-}
-
-function PlayerState.test(self)
-	return self.animation_index;
-end
-
-function PlayerState.updateAnimation(self)
-	animation = self.animations[current_animation]
-end
-
 function love.update(dt)
 	-- We update only one entity for one `love.update` call,
 	-- we increase the wrap-around index into the tables of entities to update.
@@ -123,14 +84,14 @@ function love.update(dt)
 	end
 
 	if player.x_velocity > 0 then
-		player.x_velocity = player.x_velocity - player.deccel
+		player.x_velocity = player.x_velocity - player.deccel;
 	elseif player.x_velocity < 0 then
-		player.x_velocity = player.x_velocity + player.deccel
+		player.x_velocity = player.x_velocity + player.deccel;
 	end
 end
 
 function love.draw()
-	local index = 4;
+	local index = 2;
 	local frameIndex = math.floor(animation.currentTime / animation.duration * #animation.quads[index]) + 1
 	print("frameIndex", frameIndex)
 	print("Spritesheet", animation.spritesheet)
@@ -145,29 +106,7 @@ end
 -----------------------------------
 -- No callbacks below this point --
 -----------------------------------
--- A given animation is for a given action (walking left. falling, etc...)
--- Each action is bound to condition and a callback function
--- The condition can be a keybind press or another condition (ex: falling)
--- We only have one condition at a time
--- We have an index in the spritesheet for the given action
--- We have a counter that functions as an index to the current step of the
--- animation.
--- We have a last index for the selected idle animation.
--- 	-> The idle animation can differ based on the previous animation.
--- ANIMATIONS --
--- Terminology:
---	frame_index ->  in the table of the animation for the current frame
---	animation_index -> index to get the table of frames for the current state
---		IE: falling, jumping, going left,...
---
---	In C, we would compute the frame like this:
---		struct frame;
---		frame ** ptr = animation_table
---		frame f = ptr[animation_index][frame_index]
---
 
--- Generate an animation table ready for use
--- Each frame have the same width, height and duration
 function newAnimation(image, width, height, duration)
 	local _animation = {}
 	_animation.spritesheet = image;
