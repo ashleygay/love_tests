@@ -12,7 +12,7 @@
 
 
 AnimationState = {
-	ending_animation = 1;
+	next_animation = 1;
 	animation_index = 1; -- index into the spritesheet
 	required_conditions = {};
 	accepting_conditions = {};
@@ -29,6 +29,13 @@ Player = {
 	player_state = PlayerState;
 	animation = nil; -- initialize it
 }
+
+-- We could represent all animations `paths` as a directed graph:
+-- (walking_state) => jumping
+--				   => attacking
+--				   => falling
+--				   => taking damage
+-- TODO: entry point == initial state??
 
 -- A given animation is for a given action (walking left. falling, etc...)
 -- Each action is bound to condition and a callback function
@@ -49,8 +56,6 @@ Player = {
 --		struct frame;
 --		frame ** ptr = animation_table
 --		frame f = ptr[animation_index][frame_index]
---
---
 
 function Player.InitAnimation(self, str, w, h, duration)
 	self.animation = newAnimation(str, w, h, duration);

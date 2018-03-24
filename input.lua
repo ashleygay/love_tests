@@ -1,3 +1,9 @@
+
+keybindings = {}
+keybindings["Left"] = 'h'
+keybindings["Right"] = 'l'
+keybindings["Jump"] = 'k'
+
 -- Input functions
 --
 function isDown(str)
