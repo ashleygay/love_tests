@@ -10,32 +10,64 @@
 
 -- Lookup metatable for `classes`
 
+require "input"
 
-AnimationState = {
-	next_animation = 1;
+movingLeft = function() return isDown("Left") end
+movingRight = function() return isDown("Right") end
+
+IdleState = {
 	animation_index = 1; -- index into the spritesheet
-	required_conditions = {};
-	accepting_conditions = {};
+	animation = nil;
+	conditions = {
+		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (movingLeft() and not movingRight()) end] = 2,
+		[function() return (movingRight() and not movingLeft()) end] = 3,
+	};
+	effect = {};
 }
 
-PlayerState = {
-	animation_state = AnimationState;
-	animations  = {[1] = animation_state};
-	can_move = true;
-	-- all for now
+LeftState = {
+	animation_index = 4; -- index into the spritesheet
+	animation = nil;
+	conditions = {
+		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (movingLeft() and not movingRight()) end] = 2,
+		[function() return (movingRight() and not movingLeft()) end] = 3,
+	};
+	effect = moveLeft;
 }
 
-Player = {
-	player_state = PlayerState;
-	animation = nil; -- initialize it
+RightState = {
+	animation_index = 4; -- index into the spritesheet
+	animation = nil;
+	conditions = {
+		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (movingLeft() and not movingRight()) end] = 2,
+		[function() return (movingRight() and not movingLeft()) end] = 3,
+	};
+	effect = moveRight;
 }
+
+-- Global animation set containg all animations
+GlobalAnimationTable = {};
+GlobalAnimationTable[1] = IdleState;
+GlobalAnimationTable[2] = LeftState;
+GlobalAnimationTable[3] = RightState;
+--HACK CHANGE IT GOD ITS BAD
+GlobalAnimationTable[4] = RightState;
+
+function init_animation_table(unstable)
+	for index, state in pairs(unstable) do
+		state.animation = newSpritesheet(love.graphics.newImage("robots.png"),
+			64, 64, 1/4, state.animation_index);
+	end
+end
 
 -- We could represent all animations `paths` as a directed graph:
 -- (walking_state) => jumping
 --				   => attacking
 --				   => falling
 --				   => taking damage
--- TODO: entry point == initial state??
 
 -- A given animation is for a given action (walking left. falling, etc...)
 -- Each action is bound to condition and a callback function
@@ -57,19 +89,8 @@ Player = {
 --		frame ** ptr = animation_table
 --		frame f = ptr[animation_index][frame_index]
 
-function Player.InitAnimation(self, str, w, h, duration)
-	self.animation = newAnimation(str, w, h, duration);
-end
-
-function Player.updateAnimation(self)
-	animation = self.animations[current_animation];
-end
-
-function Player.animationHasEnded(self)
-	
-end
-
-function newAnimation(image, width, height, duration)
+-- TODO We specify the nth line that we take for the animation
+function newSpritesheet(image, width, height, duration, row)
 	local _animation = {}
 	_animation.spritesheet = image;
 	_animation.quads = {{},{},{},{}}; --TODO: fix that shit

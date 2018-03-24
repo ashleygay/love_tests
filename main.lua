@@ -15,18 +15,13 @@ actions = {}
 rotation = 0
 camera_acc = -0.1
 
---------------------
--- LOVE callbacks --
---------------------
 
-function love.load()
-	animation = newAnimation(love.graphics.newImage("more_robots.png"), 64, 64, 1/4)
-	-- Platform setup
-	platform.width = love.graphics.getWidth()
-	platform.height = love.graphics.getHeight()
-	platform.x = 0
-	platform.y = platform.height / 2
-
+player = {
+	animation_index = 1;
+	frame_index = 1;
+	can_move = true;
+	-- all for now
+}
 	-- Player setup
 	player.x = love.graphics.getWidth() / 2
 	player.y = love.graphics.getHeight() / 2
@@ -39,6 +34,19 @@ function love.load()
 	player.accel = 300
 	player.deccel = 100
 	player.max_abs_speed = 600
+
+--------------------
+-- LOVE callbacks --
+--------------------
+
+function love.load()
+	animation = new_animation(love.graphics.newImage("robots.png"), 64, 64, 1/4)
+	-- Platform setup
+	platform.width = love.graphics.getWidth()
+	platform.height = love.graphics.getHeight()
+	platform.x = 0
+	platform.y = platform.height / 2
+	init_animation_table(GlobalAnimationTable);
 end
 
 function love.update(dt)
@@ -46,6 +54,8 @@ function love.update(dt)
 	-- we increase the wrap-around index into the tables of entities to update.
 
 	-- Right most case
+	-- TODO: Remove the woblyness
+	-- Actually maybe wait for the collision detection to do it
 	if player.x > (love.graphics.getWidth() - player.img:getWidth()) then
 		player.x = (love.graphics.getWidth() - player.img:getWidth())
 		player.x_velocity = 0
@@ -56,12 +66,10 @@ function love.update(dt)
 		player.x = player.x + (player.x_velocity * dt)
 	end
 
-	local right = function() return isDown("Right") end
-	print("Is Down ?", right)
-	if right() then
-		moveRight()
+	if isDown("Right") then
+		moveRight(player)
 	elseif isDown("Left") then
-		moveLeft()
+		moveLeft(player)
 	end
 
 	if isDown("Jump") then
@@ -80,11 +88,7 @@ function love.update(dt)
 		player.y = player.ground
 	end
 
-	-- update animation
-	animation.currentTime = animation.currentTime + dt
-	if animation.currentTime >= animation.duration then
-		animation.currentTime = animation.currentTime - animation.duration
-	end
+	update_player(player, dt)
 
 	if player.x_velocity > 0 then
 		player.x_velocity = player.x_velocity - player.deccel;
@@ -100,24 +104,73 @@ function love.update(dt)
 		camera_acc = -0.01;
 	end
 	rotation = rotation + camera_acc
+	-- TODO simplify this calculus
+	player.frame_index = math.floor(
+		animation.currentTime / animation.duration *
+		#animation.quads[player.animation_index]) + 1
 end
 
 function love.draw()
-	love.graphics.rotate(rotation);
-	local index = 4;
-	-- Lua tables are indexed at 1.
-	local frameIndex = math.floor(animation.currentTime / animation.duration * #animation.quads[index]) + 1
-	print("frameIndex", frameIndex)
-	print("Spritesheet", animation.spritesheet)
-	print("quad[frameIndex]", animation.quads[frameIndex])
-	love.graphics.draw(animation.spritesheet, animation.quads[index][frameIndex], 0, 0, 0, 2)
+	--love.graphics.rotate(rotation);
+	love.graphics.draw(animation.spritesheet,
+		animation.quads[player.animation_index][player.frame_index],
+		player.x, player.y - 120, 0, 2)
 
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height)
-	love.graphics.draw(player.img, player.x, player.y, 0, 1, 1, 0, 32)
 
 end
 
 -----------------------------------
 -- No callbacks below this point --
 -----------------------------------
+
+function update_player(player, dt)
+
+	animation.currentTime = animation.currentTime + dt
+	if animation.currentTime >= animation.duration then
+		-- We restart at the first animation
+		animation.currentTime = animation.currentTime - animation.duration
+	end
+
+
+	-- TODO If some conditions are sucessfull, we update the current animation.
+	-- We use the animation index(in the psritesheet) as the index into the
+	-- animation table, it would be better to change the currently owned
+	-- animation of the player.
+	local conditions = GlobalAnimationTable[player.animation_index].conditions;
+	for condition, index in pairs(conditions) do
+		if condition() then
+			player.animation_index =
+				GlobalAnimationTable[index].animation_index;
+		end
+	end
+
+end
+
+function new_animation(image, width, height, duration)
+	local _animation = {}
+	_animation.spritesheet = image;
+	_animation.quads = {{},{},{},{}}; --TODO: fix that shit
+print("Image", image)
+	print("Creating spritesheet", _animation.spritesheet)
+
+	local index = 1;
+	for y = 0, image:getHeight() - height, height do
+		for x = 0, image:getWidth() - width, width do
+			print("Test", x, y, width, height, "Index:", index)
+			table.insert(_animation.quads[index], love.graphics.newQuad(x, y,
+				width, height, image:getDimensions()))
+        end
+		index = index + 1;
+    end
+
+	_animation.duration = duration or 1
+	_animation.currentTime = 0
+
+	print("Returning spritesheet", _animation.spritesheet)
+	return _animation
+end
+
+
+
