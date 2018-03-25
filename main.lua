@@ -40,13 +40,14 @@ player = {
 --------------------
 
 function love.load()
-	animation = new_animation(love.graphics.newImage("robots.png"), 64, 64, 1/4)
 	-- Platform setup
 	platform.width = love.graphics.getWidth()
 	platform.height = love.graphics.getHeight()
 	platform.x = 0
 	platform.y = platform.height / 2
 	init_animation_table(GlobalAnimationTable);
+	player.animation = GlobalAnimationTable[1].animation;
+	player.animation_index = 1;
 end
 
 function love.update(dt)
@@ -64,12 +65,6 @@ function love.update(dt)
 		player.x_velocity = 0
 	else -- Normal case
 		player.x = player.x + (player.x_velocity * dt)
-	end
-
-	if isDown("Right") then
-		moveRight(player)
-	elseif isDown("Left") then
-		moveLeft(player)
 	end
 
 	if isDown("Jump") then
@@ -104,16 +99,14 @@ function love.update(dt)
 		camera_acc = -0.01;
 	end
 	rotation = rotation + camera_acc
-	-- TODO simplify this calculus
-	player.frame_index = math.floor(
-		animation.currentTime / animation.duration *
-		#animation.quads[player.animation_index]) + 1
+	player.frame_index = compute_next_frame_index(player);
 end
 
 function love.draw()
 	--love.graphics.rotate(rotation);
-	love.graphics.draw(animation.spritesheet,
-		animation.quads[player.animation_index][player.frame_index],
+	-- TODO
+	love.graphics.draw(player.animation.spritesheet,
+		player.animation.quads[player.frame_index],
 		player.x, player.y - 120, 0, 2)
 
 	love.graphics.setColor(255, 255, 255)
@@ -127,10 +120,10 @@ end
 
 function update_player(player, dt)
 
-	animation.currentTime = animation.currentTime + dt
-	if animation.currentTime >= animation.duration then
+	player.animation.currentTime = player.animation.currentTime + dt
+	if player.animation.currentTime >= player.animation.duration then
 		-- We restart at the first animation
-		animation.currentTime = animation.currentTime - animation.duration
+		player.animation.currentTime = player.animation.currentTime - player.animation.duration
 	end
 
 
@@ -141,36 +134,43 @@ function update_player(player, dt)
 	local conditions = GlobalAnimationTable[player.animation_index].conditions;
 	for condition, index in pairs(conditions) do
 		if condition() then
-			player.animation_index =
-				GlobalAnimationTable[index].animation_index;
+			player.animation_index = index;
+			player.animation = GlobalAnimationTable[index].animation;
 		end
 	end
 
+	-- We play the effect of the change of state.
+	GlobalAnimationTable[player.animation_index].effect(player)
+
 end
 
-function new_animation(image, width, height, duration)
-	local _animation = {}
-	_animation.spritesheet = image;
-	_animation.quads = {{},{},{},{}}; --TODO: fix that shit
-print("Image", image)
-	print("Creating spritesheet", _animation.spritesheet)
+-- function new_animation(image, width, height, duration)
+-- 	local _animation = {}
+-- 	_animation.spritesheet = image;
+-- 	_animation.quads = {{},{},{},{}}; --TODO: fix that shit
+-- print("Image", image)
+-- 	print("Creating spritesheet", _animation.spritesheet)
+-- 
+-- 	local index = 1;
+-- 	for y = 0, image:getHeight() - height, height do
+-- 		for x = 0, image:getWidth() - width, width do
+-- 			print("Test", x, y, width, height, "Index:", index)
+-- 			table.insert(_animation.quads[index], love.graphics.newQuad(x, y,
+-- 				width, height, image:getDimensions()))
+--         end
+-- 		index = index + 1;
+--     end
+-- 
+-- 	_animation.duration = duration or 1
+-- 	_animation.currentTime = 0
+-- 
+-- 	print("Returning spritesheet", _animation.spritesheet)
+-- 	return _animation
+-- end
 
-	local index = 1;
-	for y = 0, image:getHeight() - height, height do
-		for x = 0, image:getWidth() - width, width do
-			print("Test", x, y, width, height, "Index:", index)
-			table.insert(_animation.quads[index], love.graphics.newQuad(x, y,
-				width, height, image:getDimensions()))
-        end
-		index = index + 1;
-    end
-
-	_animation.duration = duration or 1
-	_animation.currentTime = 0
-
-	print("Returning spritesheet", _animation.spritesheet)
-	return _animation
+function compute_next_frame_index(player)
+	return math.floor(
+		player.animation.currentTime / player.animation.duration *
+		#player.animation.quads) + 1
 end
-
-
 

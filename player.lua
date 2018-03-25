@@ -16,14 +16,15 @@ movingLeft = function() return isDown("Left") end
 movingRight = function() return isDown("Right") end
 
 IdleState = {
-	animation_index = 1; -- index into the spritesheet
+	animation_index = 2; -- index into the spritesheet
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (movingLeft() and movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
-	effect = {};
+	effect = function(player) end;
 }
 
 LeftState = {
@@ -31,6 +32,7 @@ LeftState = {
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (movingLeft() and movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
@@ -42,6 +44,7 @@ RightState = {
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (movingLeft() and movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
@@ -93,24 +96,26 @@ end
 function newSpritesheet(image, width, height, duration, row)
 	local _animation = {}
 	_animation.spritesheet = image;
-	_animation.quads = {{},{},{},{}}; --TODO: fix that shit
+	_animation.quads = {}; --TODO: fix that shit
 
 	print("Image", image)
 	print("Creating spritesheet", _animation.spritesheet)
 
-	local index = 1;
-	for y = 0, image:getHeight() - height, height do
-		for x = 0, image:getWidth() - width, width do
-			print("Test", x, y, width, height, "Index:", index)
-			table.insert(_animation.quads[index], love.graphics.newQuad(x, y,
-				width, height, image:getDimensions()))
-        end
-		index = index + 1;
+	-- Height is the iterator, we add height each loop iteration.
+	print("Height ", height)
+
+	local actual_height = (row - 1) * height;
+	for x = 0, image:getWidth() - width, width do
+			print("Test", x, y, width, height);
+			table.insert(_animation.quads,
+				love.graphics.newQuad(x,actual_height, width, actual_height,
+				image:getDimensions()))
     end
 
 	_animation.duration = duration or 1
 	_animation.currentTime = 0
 
+	print("Table size ", table.getn(_animation.quads))
 	print("Returning spritesheet", _animation.spritesheet)
 	return _animation
 end
