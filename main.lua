@@ -136,30 +136,6 @@ function update_player(player, dt)
 	end
 end
 
--- function new_animation(image, width, height, duration)
--- 	local _animation = {}
--- 	_animation.spritesheet = image;
--- 	_animation.quads = {{},{},{},{}}; --TODO: fix that shit
--- print("Image", image)
--- 	print("Creating spritesheet", _animation.spritesheet)
--- 
--- 	local index = 1;
--- 	for y = 0, image:getHeight() - height, height do
--- 		for x = 0, image:getWidth() - width, width do
--- 			print("Test", x, y, width, height, "Index:", index)
--- 			table.insert(_animation.quads[index], love.graphics.newQuad(x, y,
--- 				width, height, image:getDimensions()))
---         end
--- 		index = index + 1;
---     end
--- 
--- 	_animation.duration = duration or 1
--- 	_animation.currentTime = 0
--- 
--- 	print("Returning spritesheet", _animation.spritesheet)
--- 	return _animation
--- end
-
 function compute_next_frame_index(player)
 	return math.floor(
 		player.animation.currentTime / player.animation.duration *

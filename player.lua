@@ -64,14 +64,16 @@ JumpState = {
 	effect = jump;
 }
 
+-- TODO: somehow make animation `inherit` from another ?
+-- Example: When attacked, we might want the same state and conditions but with
+-- different animations depending if the player is hit mid-air or on the ground.
+
 -- Global animation set containg all animations
 GlobalAnimationTable = {};
 GlobalAnimationTable[1] = IdleState;
 GlobalAnimationTable[2] = LeftState;
 GlobalAnimationTable[3] = RightState;
 GlobalAnimationTable[4] = JumpState;
-
---GlobalAnimationTable[5] = LandingState;
 
 function init_animation_table(unstable)
 	for index, state in pairs(unstable) do
