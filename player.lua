@@ -67,6 +67,11 @@ JumpState = {
 -- Example: When attacked, we might want the same state and conditions but with
 -- different animations depending if the player is hit mid-air or on the ground.
 
+-- TODO How do we do timed animation ?
+--	IE: If you combo into the next hit at a specific frame, bonus damage
+
+-- TODO How do we launch projectiles ?
+
 -- Global animation set containg all animations
 GlobalAnimationTable = {};
 GlobalAnimationTable[1] = IdleState;
@@ -77,7 +82,7 @@ GlobalAnimationTable[4] = JumpState;
 function init_animation_table(unstable)
 	for index, state in pairs(unstable) do
 		state.animation = newSpritesheet(love.graphics.newImage("robots.png"),
-			64, 64, 1/4, state.spritesheet_row);
+			64, 64, 1/2, state.spritesheet_row);
 	end
 end
 
