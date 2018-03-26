@@ -20,7 +20,6 @@ IdleState = {
 	spritesheet_row = 1; -- index into the spritesheet
 	animation = nil;
 	conditions = {
-		[function() return (not movingLeft() and not movingRight()) end] = 1,
 		[function(player) return canJump(player) end] = 4,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
