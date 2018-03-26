@@ -14,14 +14,14 @@ require "input"
 
 movingLeft = function() return isDown("Left") end
 movingRight = function() return isDown("Right") end
-jumping = function() return isDown("Jump") end
+canJump = function(player) return (isDown("Jump") and player.y_velocity == 0) end
 
 IdleState = {
-	spritesheet_row = 2; -- index into the spritesheet
+	spritesheet_row = 1; -- index into the spritesheet
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
-		[function() return jumping() end] = 4,
+		[function(player) return canJump(player) end] = 4,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
@@ -56,9 +56,10 @@ JumpState = {
 	animation = nil;
 	conditions = {
 		-- We return to idle mode to move left and right
-		[function() return true end] = 1,
-		[function() return (movingLeft() and not movingRight()) end] = 2,
-		[function() return (movingRight() and not movingLeft()) end] = 3,
+		 --[function() return true end] = 1,
+		 [function(player) return canJump(player) end] = 4,
+		 [function() return (movingLeft() and not movingRight()) end] = 2,
+		 [function() return (movingRight() and not movingLeft()) end] = 3,
 	};
 	effect = jump;
 }
@@ -121,7 +122,7 @@ function newSpritesheet(image, width, height, duration, row)
 	for x = 0, image:getWidth() - width, width do
 			print("Test", x, y, width, height);
 			table.insert(_animation.quads,
-				love.graphics.newQuad(x,actual_height, width, actual_height,
+				love.graphics.newQuad(x, actual_height, width, height,
 				image:getDimensions()))
     end
 

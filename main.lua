@@ -97,8 +97,7 @@ function love.update(dt)
 end
 
 function love.draw()
-	--love.graphics.rotate(rotation);
-	-- TODO
+	-- love.graphics.rotate(rotation);
 	love.graphics.draw(player.animation.spritesheet,
 		player.animation.quads[player.frame_index],
 		player.x, player.y - 120, 0, 2)
@@ -120,22 +119,21 @@ function update_player(player, dt)
 		player.animation.currentTime = player.animation.currentTime - player.animation.duration
 	end
 
-
-	-- TODO If some conditions are sucessfull, we update the current animation.
-	-- We use the animation index(in the psritesheet) as the index into the
-	-- animation table, it would be better to change the currently owned
-	-- animation of the player.
+	-- If a condition is sucessful, we update the current animation.
+	-- We get the possible next states of the current animation
 	local conditions = GlobalAnimationTable[player.animation_index].conditions;
 	for condition, index in pairs(conditions) do
-		if condition() then
+		print("Vertical velocity", player.y_velocity, "Jump?", isDown("Jump"))
+		-- If an animation is succesful, we change the current animation to it.
+		if condition(player) then
 			player.animation_index = index;
 			player.animation = GlobalAnimationTable[index].animation;
+			-- We play the effect of the change of state.
+			GlobalAnimationTable[player.animation_index].effect(player)
+			player.animation.currentTime = 0; -- Reset the animation timer
+			break;
 		end
 	end
-
-	-- We play the effect of the change of state.
-	GlobalAnimationTable[player.animation_index].effect(player)
-
 end
 
 -- function new_animation(image, width, height, duration)
