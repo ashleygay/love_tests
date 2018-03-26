@@ -67,12 +67,6 @@ function love.update(dt)
 		player.x = player.x + (player.x_velocity * dt)
 	end
 
-	if isDown("Jump") then
-		if player.y_velocity == 0 then
-			player.y_velocity = player.jump_height
-		end
-	end
-
 	if player.y_velocity ~= 0 then
 		player.y = player.y + player.y_velocity * dt
 		player.y_velocity = player.y_velocity - player.gravity * dt

@@ -23,3 +23,8 @@ function moveLeft(player)
 	end
 end
 
+function jump(player)
+		if player.y_velocity == 0 then
+			player.y_velocity = player.jump_height
+		end
+end

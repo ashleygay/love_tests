@@ -14,13 +14,14 @@ require "input"
 
 movingLeft = function() return isDown("Left") end
 movingRight = function() return isDown("Right") end
+jumping = function() return isDown("Jump") end
 
 IdleState = {
-	animation_index = 2; -- index into the spritesheet
+	spritesheet_row = 2; -- index into the spritesheet
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
-		[function() return (movingLeft() and movingRight()) end] = 1,
+		[function() return jumping() end] = 4,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
@@ -28,11 +29,10 @@ IdleState = {
 }
 
 LeftState = {
-	animation_index = 4; -- index into the spritesheet
+	spritesheet_row = 4; -- index into the spritesheet
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
-		[function() return (movingLeft() and movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
@@ -40,15 +40,27 @@ LeftState = {
 }
 
 RightState = {
-	animation_index = 4; -- index into the spritesheet
+	spritesheet_row = 4; -- index into the spritesheet
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
-		[function() return (movingLeft() and movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
 	effect = moveRight;
+}
+
+
+JumpState = {
+	spritesheet_row = 2; -- index into the spritesheet
+	animation = nil;
+	conditions = {
+		-- We return to idle mode to move left and right
+		[function() return true end] = 1,
+		[function() return (movingLeft() and not movingRight()) end] = 2,
+		[function() return (movingRight() and not movingLeft()) end] = 3,
+	};
+	effect = jump;
 }
 
 -- Global animation set containg all animations
@@ -56,13 +68,14 @@ GlobalAnimationTable = {};
 GlobalAnimationTable[1] = IdleState;
 GlobalAnimationTable[2] = LeftState;
 GlobalAnimationTable[3] = RightState;
---HACK CHANGE IT GOD ITS BAD
-GlobalAnimationTable[4] = RightState;
+GlobalAnimationTable[4] = JumpState;
+
+--GlobalAnimationTable[5] = LandingState;
 
 function init_animation_table(unstable)
 	for index, state in pairs(unstable) do
 		state.animation = newSpritesheet(love.graphics.newImage("robots.png"),
-			64, 64, 1/4, state.animation_index);
+			64, 64, 1/4, state.spritesheet_row);
 	end
 end
 
@@ -84,13 +97,13 @@ end
 -- ANIMATIONS --
 -- Terminology:
 --	frame_index ->  in the table of the animation for the current frame
---	animation_index -> index to get the table of frames for the current state
+--	spritesheet_row -> index to get the table of frames for the current state
 --		IE: falling, jumping, going left,...
 --
 --	In C, we would compute the frame like this:
 --		struct frame;
 --		frame ** ptr = animation_table
---		frame f = ptr[animation_index][frame_index]
+--		frame f = ptr[spritesheet_row][frame_index]
 
 -- TODO We specify the nth line that we take for the animation
 function newSpritesheet(image, width, height, duration, row)
