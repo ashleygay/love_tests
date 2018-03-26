@@ -33,7 +33,7 @@ LeftState = {
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
-		[function() return (movingRight() and not movingLeft()) end] = 3,
+		--[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
 	effect = moveLeft;
 }
@@ -43,7 +43,7 @@ RightState = {
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
-		[function() return (movingLeft() and not movingRight()) end] = 2,
+		--[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
 	effect = moveRight;

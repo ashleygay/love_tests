@@ -98,6 +98,7 @@ end
 
 function love.draw()
 	-- love.graphics.rotate(rotation);
+	-- TODO use love.grpahics.zoom to enable fullscreen.
 	love.graphics.draw(player.animation.spritesheet,
 		player.animation.quads[player.frame_index],
 		player.x, player.y - 120, 0, 2)
@@ -124,13 +125,16 @@ function update_player(player, dt)
 	local conditions = GlobalAnimationTable[player.animation_index].conditions;
 	for condition, index in pairs(conditions) do
 		print("Vertical velocity", player.y_velocity, "Jump?", isDown("Jump"))
-		-- If an animation is succesful, we change the current animation to it.
+		-- If a condition is succesful, we change the current animation to it.
 		if condition(player) then
+			--XXX I dont like this, find a way to remove that code
+			if not (player.animation_index == index) then
+				player.animation.currentTime = 0; -- Reset the animation timer
+			end
 			player.animation_index = index;
 			player.animation = GlobalAnimationTable[index].animation;
-			-- We play the effect of the change of state.
+			-- We play the effect of the new state.
 			GlobalAnimationTable[player.animation_index].effect(player)
-			player.animation.currentTime = 0; -- Reset the animation timer
 			break;
 		end
 	end
