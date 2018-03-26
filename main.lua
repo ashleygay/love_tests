@@ -32,8 +32,9 @@ player = {
 	player.jump_height = -500
 	player.gravity = -1500
 	player.accel = 300
-	player.deccel = 100
+	player.deccel = 150
 	player.max_abs_speed = 600
+	player.spritenum = 1;
 
 --------------------
 -- LOVE callbacks --
@@ -93,14 +94,13 @@ function love.update(dt)
 		camera_acc = -0.01;
 	end
 	rotation = rotation + camera_acc
-	player.frame_index = compute_next_frame_index(player);
 end
 
 function love.draw()
-	-- love.graphics.rotate(rotation);
 	-- TODO use love.grpahics.zoom to enable fullscreen.
+	love.graphics.scale(2, 2);
 	love.graphics.draw(player.animation.spritesheet,
-		player.animation.quads[player.frame_index],
+		player.animation.quads[player.spritenum],
 		player.x, player.y - 120, 0, 2)
 
 	love.graphics.setColor(255, 255, 255)
@@ -124,7 +124,6 @@ function update_player(player, dt)
 	-- We get the possible next states of the current animation
 	local conditions = GlobalAnimationTable[player.animation_index].conditions;
 	for condition, index in pairs(conditions) do
-		print("Vertical velocity", player.y_velocity, "Jump?", isDown("Jump"))
 		-- If a condition is succesful, we change the current animation to it.
 		if condition(player) then
 			--XXX I dont like this, find a way to remove that code
@@ -138,6 +137,8 @@ function update_player(player, dt)
 			break;
 		end
 	end
+
+	player.spritenum = compute_next_frame_index(player);
 end
 
 function compute_next_frame_index(player)
