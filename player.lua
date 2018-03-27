@@ -33,7 +33,7 @@ LeftState = {
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
-		--[function() return (movingRight() and not movingLeft()) end] = 3,
+		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
 	effect = moveLeft;
 }
@@ -43,8 +43,10 @@ RightState = {
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
-		--[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
+		[function() return (movingLeft() and not movingRight()) end] = 2,
+		-- In that case, maybe we want a special case, like the character turning
+		-- around.
 	};
 	effect = moveRight;
 }
@@ -69,6 +71,7 @@ JumpState = {
 
 -- TODO How do we do timed animation ?
 --	IE: If you combo into the next hit at a specific frame, bonus damage
+--		Draw a specific example with real sprites (megaman X probably)
 
 -- TODO How do we launch projectiles ?
 
@@ -81,7 +84,7 @@ GlobalAnimationTable[4] = JumpState;
 
 function init_animation_table(unstable)
 	for index, state in pairs(unstable) do
-		state.animation = newSpritesheet(love.graphics.newImage("robots.png"),
+		state.animation = newSpritesheet(love.graphics.newImage("out.png"),
 			64, 64, 1/2, state.spritesheet_row);
 	end
 end

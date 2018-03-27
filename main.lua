@@ -97,8 +97,11 @@ function love.update(dt)
 end
 
 function love.draw()
-	-- TODO use love.grpahics.zoom to enable fullscreen.
-	love.graphics.scale(2, 2);
+	--- TODO: create a screen object
+	local x_scale = love.graphics.getWidth() / platform.width;
+	local y_scale = love.graphics.getHeight() / platform.height;
+	love.graphics.scale(x_scale, y_scale);
+
 	love.graphics.draw(player.animation.spritesheet,
 		player.animation.quads[player.spritenum],
 		player.x, player.y - 120, 0, 2)
