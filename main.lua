@@ -25,7 +25,6 @@ player = {
 	-- Player setup
 	player.x = love.graphics.getWidth() / 2
 	player.y = love.graphics.getHeight() / 2
-	player.img = love.graphics.newImage('purple.png')
 	player.x_velocity = 0
 	player.ground = player.y
 	player.y_velocity = player.y
@@ -58,8 +57,8 @@ function love.update(dt)
 	-- Right most case
 	-- TODO: Remove the woblyness
 	-- Actually maybe wait for the collision detection to do it
-	if player.x > (love.graphics.getWidth() - player.img:getWidth()) then
-		player.x = (love.graphics.getWidth() - player.img:getWidth())
+	if player.x > (love.graphics.getWidth() - 64) then
+		player.x = (love.graphics.getWidth() - 64)
 		player.x_velocity = 0
 	elseif player.x < 0 then -- Left most case
 		player.x = 1
@@ -102,12 +101,22 @@ function love.draw()
 	local y_scale = love.graphics.getHeight() / platform.height;
 	love.graphics.scale(x_scale, y_scale);
 
-	love.graphics.draw(player.animation.spritesheet,
-		player.animation.quads[player.spritenum],
-		player.x, player.y - 120, 0, 2)
-
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height)
+
+	love.graphics.draw(player.animation.spritesheet,
+		player.animation.quads[player.spritenum],
+		player.x, player.y - 64, 0, 2)
+
+--  XXX: userdata vs table ???
+--	print("Quad", player.animation.quads[player.spritenum])
+--	for key, value in pairs(player.animation.quads[player.spritenum]) do
+--		print(key, "=", value)
+--	end
+	print("Sprite height = ", player.animation.quads[player.spritenum].height)
+
+	love.graphics.setColor(123, 123, 123)
+	--love.graphics.rectangle('fill', player.x, player.y, 64, -64)
 
 end
 

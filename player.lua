@@ -72,8 +72,22 @@ JumpState = {
 -- TODO How do we do timed animation ?
 --	IE: If you combo into the next hit at a specific frame, bonus damage
 --		Draw a specific example with real sprites (megaman X probably)
+--		We switch to a given state temporarily that has special properties
+--			IE other following animations
 
--- TODO How do we launch projectiles ?
+-- TODO How do we launch projectiles ? Who owns it ?
+
+-- In C++, make all that compile time
+-- We have the core of the game that is not recompiled, but changing stuff is
+-- IE: I want to change what sprite a given character uses -> it recompiles
+--		that part of the code, how do we do that with templates ??
+--		How to have a common interface while templates are `different types`
+--		Only work with references, then what is holding them ??
+--		Do we recompile levels ? -> We have to.
+--		What happends when we kill an enemy, who handles the memory ?
+--		If we still want to do that, we have to do: - lots of typedefs
+--													- lots of macros
+-- For example, if 2 mods are not compatible we can detect it at compile time.
 
 -- Global animation set containg all animations
 GlobalAnimationTable = {};
@@ -82,10 +96,10 @@ GlobalAnimationTable[2] = LeftState;
 GlobalAnimationTable[3] = RightState;
 GlobalAnimationTable[4] = JumpState;
 
-function init_animation_table(unstable)
-	for index, state in pairs(unstable) do
-		state.animation = newSpritesheet(love.graphics.newImage("out.png"),
-			64, 64, 1/2, state.spritesheet_row);
+function init_animation_table(table)
+	for index, state in pairs(table) do
+		state.animation = newSpritesheet(love.graphics.newImage("robots.png"),
+			64, 64, 1, state.spritesheet_row);
 	end
 end
 
@@ -124,14 +138,12 @@ function newSpritesheet(image, width, height, duration, row)
 	print("Image", image)
 	print("Creating spritesheet", _animation.spritesheet)
 
-	-- Height is the iterator, we add height each loop iteration.
-	print("Height ", height)
+	local y = (row - 1) * height;
 
-	local actual_height = (row - 1) * height;
 	for x = 0, image:getWidth() - width, width do
 			print("Test", x, y, width, height);
 			table.insert(_animation.quads,
-				love.graphics.newQuad(x, actual_height, width, height,
+				love.graphics.newQuad(x, y, width, height,
 				image:getDimensions()))
     end
 
