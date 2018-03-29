@@ -54,10 +54,13 @@ function love.update(dt)
 	-- We update only one entity for one `love.update` call,
 	-- we increase the wrap-around index into the tables of entities to update.
 
-	-- XXX Wobblyness kind of `removed`, maybe replace by real collisions???
+	-- XXX Wobblyness kind of `removed`, at some point replace by real collisions???
+
+	-- dt is the time difference betwee 2 update calls
+	print("DT", dt)
 	local new_pos = player.x + (player.x_velocity * dt)
 	if not (new_pos < 0 )
-	and not (new_pos > love.graphics.getWidth()- 128)then
+	and not (new_pos > love.graphics.getWidth() - 64) then
 		player.x = new_pos
 	end
 

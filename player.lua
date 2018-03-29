@@ -81,6 +81,13 @@ JumpState = {
 	effect = jump;
 }
 
+SpriteSheet = {
+	animation_state_table = nil;
+	path = nil;
+}
+
+
+
 -- TODO: somehow make animation `inherit` from another ?
 -- Example: When attacked, we might want the same state and conditions but with
 -- different animations depending if the player is hit mid-air or on the ground.
