@@ -85,13 +85,14 @@ JumpState = {
 -- Example: When attacked, we might want the same state and conditions but with
 -- different animations depending if the player is hit mid-air or on the ground.
 
+-- TODO How do we launch projectiles ? Who owns it ?
+--		the projectile damages are determined when launching them
 -- TODO How do we do timed animation ?
 --	IE: If you combo into the next hit at a specific frame, bonus damage
 --		Draw a specific example with real sprites (megaman X probably)
 --		We switch to a given state temporarily that has special properties
 --			IE other following animations
-
--- TODO How do we launch projectiles ? Who owns it ?
+--		Create an editor to simplify the process of editing animations
 
 -- In C++, make all that compile time
 -- We have the core of the game that is not recompiled, but changing stuff is

@@ -54,16 +54,9 @@ function love.update(dt)
 	-- We update only one entity for one `love.update` call,
 	-- we increase the wrap-around index into the tables of entities to update.
 
-	-- Right most case
-	-- TODO: Remove the woblyness
-	-- Actually maybe wait for the collision detection to do it
-	if player.x > (love.graphics.getWidth() - 64) then
-		player.x = (love.graphics.getWidth() - 64)
-		player.x_velocity = 0
-	elseif player.x < 0 then -- Left most case
-		player.x = 1
-		player.x_velocity = 0
-	else -- Normal case
+	-- XXX Wobblyness kind of `removed`, maybe replace by real collisions???
+	if not ((player.x + (player.x_velocity * dt)) < 0 )
+	and not ((player.x + (player.x_velocity * dt)) > love.graphics.getWidth()- 128)then
 		player.x = player.x + (player.x_velocity * dt)
 	end
 
