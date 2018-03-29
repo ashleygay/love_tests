@@ -5,7 +5,7 @@ keybindings["Right"] = 'l'
 keybindings["Jump"] = 'k'
 
 -- Input functions
---
+-- TODO: support the use of a controller somehow
 function isDown(str)
 	return love.keyboard.isDown(keybindings[str])
 end

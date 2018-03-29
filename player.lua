@@ -16,8 +16,21 @@ movingLeft = function() return isDown("Left") end
 movingRight = function() return isDown("Right") end
 canJump = function(player) return (isDown("Jump") and player.y_velocity == 0) end
 
-IdleState = {
+IdleRightState = {
 	spritesheet_row = 1; -- index into the spritesheet
+	path = "robots.png";
+	animation = nil;
+	conditions = {
+		[function(player) return canJump(player) end] = 4,
+		[function() return (movingLeft() and not movingRight()) end] = 2,
+		[function() return (movingRight() and not movingLeft()) end] = 3,
+	};
+	effect = function(player) end;
+}
+
+IdleLeftState = {
+	spritesheet_row = 1; -- index into the spritesheet
+	path = "flipped_robots.png";
 	animation = nil;
 	conditions = {
 		[function(player) return canJump(player) end] = 4,
@@ -29,9 +42,10 @@ IdleState = {
 
 LeftState = {
 	spritesheet_row = 4; -- index into the spritesheet
+	path = "flipped_robots.png";
 	animation = nil;
 	conditions = {
-		[function() return (not movingLeft() and not movingRight()) end] = 1,
+		[function() return (not movingLeft() and not movingRight()) end] = 5,
 		[function() return (movingLeft() and not movingRight()) end] = 2,
 		[function() return (movingRight() and not movingLeft()) end] = 3,
 	};
@@ -40,6 +54,7 @@ LeftState = {
 
 RightState = {
 	spritesheet_row = 4; -- index into the spritesheet
+	path = "robots.png";
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
@@ -54,6 +69,7 @@ RightState = {
 
 JumpState = {
 	spritesheet_row = 2; -- index into the spritesheet
+	path = "robots.png";
 	animation = nil;
 	conditions = {
 		-- We return to idle mode to move left and right
@@ -91,14 +107,15 @@ JumpState = {
 
 -- Global animation set containg all animations
 GlobalAnimationTable = {};
-GlobalAnimationTable[1] = IdleState;
+GlobalAnimationTable[1] = IdleRightState;
 GlobalAnimationTable[2] = LeftState;
 GlobalAnimationTable[3] = RightState;
 GlobalAnimationTable[4] = JumpState;
+GlobalAnimationTable[5] = IdleLeftState;
 
 function init_animation_table(table)
 	for index, state in pairs(table) do
-		state.animation = newSpritesheet(love.graphics.newImage("robots.png"),
+		state.animation = newSpritesheet(love.graphics.newImage(state.path),
 			64, 64, 1, state.spritesheet_row);
 	end
 end
