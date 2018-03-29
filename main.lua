@@ -55,9 +55,10 @@ function love.update(dt)
 	-- we increase the wrap-around index into the tables of entities to update.
 
 	-- XXX Wobblyness kind of `removed`, maybe replace by real collisions???
-	if not ((player.x + (player.x_velocity * dt)) < 0 )
-	and not ((player.x + (player.x_velocity * dt)) > love.graphics.getWidth()- 128)then
-		player.x = player.x + (player.x_velocity * dt)
+	local new_pos = player.x + (player.x_velocity * dt)
+	if not (new_pos < 0 )
+	and not (new_pos > love.graphics.getWidth()- 128)then
+		player.x = new_pos
 	end
 
 	if player.y_velocity ~= 0 then
