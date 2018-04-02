@@ -10,7 +10,6 @@ entities = {}
 
 -- Table that matches conditions with their code to execute
 actions = {}
---actions[isDown] = moveRight
 
 rotation = 0
 camera_acc = -0.1
@@ -103,7 +102,7 @@ function love.draw()
 
 	love.graphics.draw(player.animation.spritesheet,
 		player.animation.quads[player.spritenum],
-		player.x, player.y - 64, 0, 2)
+		player.x, player.y - 128, 0, 2)
 
 --  XXX: userdata vs table ???
 --	print("Quad", player.animation.quads[player.spritenum])

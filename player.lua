@@ -29,8 +29,8 @@ IdleRightState = {
 }
 
 IdleLeftState = {
-	spritesheet_row = 1; -- index into the spritesheet
-	path = "flipped_robots.png";
+	spritesheet_row = 2; -- index into the spritesheet
+	path = "robots.png";
 	animation = nil;
 	conditions = {
 		[function(player) return canJump(player) end] = 4,
@@ -41,8 +41,8 @@ IdleLeftState = {
 }
 
 LeftState = {
-	spritesheet_row = 4; -- index into the spritesheet
-	path = "flipped_robots.png";
+	spritesheet_row = 8; -- index into the spritesheet
+	path = "robots.png";
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 5,
@@ -53,7 +53,7 @@ LeftState = {
 }
 
 RightState = {
-	spritesheet_row = 4; -- index into the spritesheet
+	spritesheet_row = 7; -- index into the spritesheet
 	path = "robots.png";
 	animation = nil;
 	conditions = {
@@ -116,10 +116,10 @@ SpriteSheet = {
 -- Global animation set containg all animations
 GlobalAnimationTable = {};
 GlobalAnimationTable[1] = IdleRightState;
+GlobalAnimationTable[5] = IdleLeftState;
 GlobalAnimationTable[2] = LeftState;
 GlobalAnimationTable[3] = RightState;
 GlobalAnimationTable[4] = JumpState;
-GlobalAnimationTable[5] = IdleLeftState;
 
 function init_animation_table(table)
 	for index, state in pairs(table) do
