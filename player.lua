@@ -17,8 +17,8 @@ movingRight = function() return isDown("Right") end
 canJump = function(player) return (isDown("Jump") and player.y_velocity == 0) end
 
 IdleRightState = {
-	spritesheet_row = 1; -- index into the spritesheet
-	path = "robots.png";
+	spritesheet_row = 3; -- index into the spritesheet
+	path = "hero.png";
 	animation = nil;
 	conditions = {
 		[function(player) return canJump(player) end] = 4,
@@ -124,7 +124,7 @@ GlobalAnimationTable[4] = JumpState;
 function init_animation_table(table)
 	for index, state in pairs(table) do
 		state.animation = newSpritesheet(love.graphics.newImage(state.path),
-			64, 64, 1, state.spritesheet_row);
+			16, 16, 1, state.spritesheet_row);
 	end
 end
 
