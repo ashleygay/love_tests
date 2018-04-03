@@ -102,7 +102,7 @@ function love.draw()
 
 	love.graphics.draw(player.animation.spritesheet,
 		player.animation.quads[player.spritenum],
-		player.x, player.y - 128, 0, 2)
+		player.x, player.y - 128, 0, 4)
 
 --  XXX: userdata vs table ???
 --	print("Quad", player.animation.quads[player.spritenum])

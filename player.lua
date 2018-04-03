@@ -17,7 +17,8 @@ movingRight = function() return isDown("Right") end
 canJump = function(player) return (isDown("Jump") and player.y_velocity == 0) end
 
 IdleRightState = {
-	spritesheet_row = 3; -- index into the spritesheet
+    nb_frames = 3;
+	spritesheet_row = 1; -- index into the spritesheet
 	path = "hero.png";
 	animation = nil;
 	conditions = {
@@ -29,8 +30,9 @@ IdleRightState = {
 }
 
 IdleLeftState = {
-	spritesheet_row = 2; -- index into the spritesheet
-	path = "robots.png";
+    nb_frames = 3;
+	spritesheet_row = 1; -- index into the spritesheet
+	path = "hero_flipped.png";
 	animation = nil;
 	conditions = {
 		[function(player) return canJump(player) end] = 4,
@@ -41,8 +43,9 @@ IdleLeftState = {
 }
 
 LeftState = {
-	spritesheet_row = 8; -- index into the spritesheet
-	path = "robots.png";
+    nb_frames = 4;
+	spritesheet_row = 2; -- index into the spritesheet
+	path = "hero_flipped.png";
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 5,
@@ -53,8 +56,9 @@ LeftState = {
 }
 
 RightState = {
-	spritesheet_row = 7; -- index into the spritesheet
-	path = "robots.png";
+    nb_frames = 4;
+	spritesheet_row = 2; -- index into the spritesheet
+	path = "hero.png";
 	animation = nil;
 	conditions = {
 		[function() return (not movingLeft() and not movingRight()) end] = 1,
@@ -68,8 +72,9 @@ RightState = {
 
 
 JumpState = {
+    nb_frames = 1;
 	spritesheet_row = 2; -- index into the spritesheet
-	path = "robots.png";
+	path = "hero.png";
 	animation = nil;
 	conditions = {
 		-- We return to idle mode to move left and right
@@ -122,9 +127,12 @@ GlobalAnimationTable[3] = RightState;
 GlobalAnimationTable[4] = JumpState;
 
 function init_animation_table(table)
+    local start_x = 16;
+    local start_y = 16;
+    local nb_frames = 4;
 	for index, state in pairs(table) do
 		state.animation = newSpritesheet(love.graphics.newImage(state.path),
-			16, 16, 1, state.spritesheet_row);
+			start_x, start_y, 16, 16, 1/2, state.nb_frames, state.spritesheet_row);
 	end
 end
 
@@ -155,7 +163,8 @@ end
 --		frame f = ptr[spritesheet_row][frame_index]
 
 -- TODO We specify the nth line that we take for the animation
-function newSpritesheet(image, width, height, duration, row)
+function newSpritesheet(image, start_x, start_y, width, height,
+                        duration, nb_frames, row)
 	local _animation = {}
 	_animation.spritesheet = image;
 	_animation.quads = {}; --TODO: fix that shit
@@ -163,13 +172,18 @@ function newSpritesheet(image, width, height, duration, row)
 	print("Image", image)
 	print("Creating spritesheet", _animation.spritesheet)
 
-	local y = (row - 1) * height;
+	local y = (row - 1) * height + start_y;
 
-	for x = 0, image:getWidth() - width, width do
+    local frames = 0;
+	for x = start_x, image:getWidth() - width - start_x, width do
 			print("Test", x, y, width, height);
 			table.insert(_animation.quads,
 				love.graphics.newQuad(x, y, width, height,
 				image:getDimensions()))
+            frames = frames + 1;
+            if (frames > nb_frames) then
+                break;
+            end
     end
 
 	_animation.duration = duration or 1
